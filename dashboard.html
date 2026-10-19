@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Karyawan - Afdeling 4</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-logout {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        h3 {
+            margin-bottom: 15px;
+            color: #007bff;
+            border-bottom: 2px solid #f4f6f9;
+            padding-bottom: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .bg-hadir { background-color: #28a745; }
+        .bg-izin { background-color: #ffc107; color: #333; }
+        .bg-cuti { background-color: #17a2b8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header Dashboard -->
+        <header>
+            <div>
+                <h2>Dashboard Afdeling 4</h2>
+                <p>Halo, <span id="userDisplay" style="font-weight: bold;">Karyawan</span></p>
+            </div>
+            <button class="btn-logout" id="btnLogout">Keluar</button>
+        </header>
+
+        <!-- Form Absensi & Laporan Kerja -->
+        <div class="card">
+            <h3>Input Absensi & Laporan Harian</h3>
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="inputDate">Tanggal Hari Ini</label>
+                    <input type="date" id="inputDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="statusAbsen">Status Absensi</label>
+                    <select id="statusAbsen" required>
+                        <option value="Hadir">Hadir</option>
+                        <option value="Izin">Izin</option>
+                        <option value="Cuti">Cuti</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputJob">Format Pekerjaan / Deskripsi Tugas</label>
+                    <textarea id="inputJob" rows="3" placeholder="Contoh: Pemeliharaan tanaman blok B, panen, dll." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputHK">Hari Kerja (HK)</label>
+                    <input type="number" id="inputHK" step="0.1" min="0" max="1" placeholder="Contoh: 1 atau 0.5 jika setengah hari" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputGaji">Estimasi Gaji Harian (Rp)</label>
+                    <input type="number" id="inputGaji" placeholder="Contoh: 120000" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Kirim Laporan</button>
+            </form>
+        </div>
+
+        <!-- Tabel Riwayat khusus untuk user yang login (Privat) -->
+        <div class="card">
+            <h3>Riwayat Laporan Anda (Privat)</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Absen</th>
+                            <th>Pekerjaan</th>
+                            <th>HK</th>
+                            <th>Gaji Harian</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Data riwayat dari database akan muncul di sini menggunakan JavaScript -->
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #777;">Memuat data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SDK Firebase pendukung (Harus sama versinya dengan yang ada di index.html) -->
+    <script src="js/firebase-app-compat.js"></script>
+    <script src="js/firebase-auth-compat.js"></script>
+    <script src="js/firebase-firestore-compat.js"></script>
+
+    <!-- File JavaScript yang sama untuk memproses pengiriman data -->
+    <script src="js/app.js"></script>
+</body>
+</html>
